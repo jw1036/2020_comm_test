@@ -20,34 +20,9 @@ from PyQt5.QtWidgets import QMainWindow, QApplication, QMessageBox
 
 from comm import Comm, CommError, CommTimeoutError
 from packet import PacketBuilder
+import hexdump
 
 _ENCODING = "euc-kr"
-
-
-def make_hexdump(dat):
-    out = ""
-    for i in range(0, len(dat), 16):
-        h = ' '.join(["%02X" % c for c in dat[i:i + 16]])
-        a = ''.join(["%c" % c if 0x20 <= c <= 0x7e else '.' for c in dat[i:i + 16]])
-        out += f"  {i:08X}  {h:<47s}  |{a}|\n"
-    return out
-
-
-def make_strdump(dat, encoding=_ENCODING):
-    out = ""
-    pos = 0
-    while pos < len(dat):
-        if dat[pos] >= 0x80:
-            try:
-                out += dat[pos:pos + 2].decode(encoding=encoding)
-                pos += 2
-                continue
-            except Exception as ex:
-                print(f"make_strdump: {dat[pos:pos + 2]} {ex}")
-
-        out += chr(dat[pos]) if 0x20 <= dat[pos] <= 0x7e else '.'
-        pos += 1
-    return "|" + out + "|"
 
 
 class SerialTest(QMainWindow):
@@ -131,14 +106,14 @@ class SerialTest(QMainWindow):
             if self.comm:
                 dat = self.ui.edt_dat.toPlainText().replace('\n', '').encode(_ENCODING)
                 dat = PacketBuilder().decode(dat).build()
-                dat = self.comm.build(dat)
+                dat = Comm.build(dat)
 
                 self.append_log(dat, ">>")
                 self.scroll_log()
 
                 self.comm.write(dat)
         except Exception as ex:
-            QMessageBox.warning(self, self.windowTitle(), str(ex))
+            QMessageBox.warning(self, "SEND", str(ex))
 
     def append_log(self, dat, sender):
         ts = datetime.datetime.now().strftime("%H:%M:%S.%f")[:-3]
@@ -156,10 +131,10 @@ class SerialTest(QMainWindow):
         log = self.ui.lst_log.currentItem().text()
         ts, sender, dump = log.split()
         dat = binascii.unhexlify(dump)
-        hexdump = make_hexdump(dat)
-        strdump = make_strdump(dat, encoding=_ENCODING)
-        self.ui.edt_log.setPlainText(f"{ts} {sender} {len(dat)} bytes\n{hexdump}")
-        self.ui.txt_log.setText(strdump)
+        hd = hexdump.hexdump(dat)
+        sd = hexdump.strdump(dat, encoding=_ENCODING)
+        self.ui.edt_log.setPlainText(f"{ts} {sender} {len(dat)} bytes\n{hd}")
+        self.ui.txt_log.setText(sd)
 
     @pyqtSlot()
     def on_btn_open_clicked(self):
@@ -184,7 +159,7 @@ class SerialTest(QMainWindow):
                 self.ui.btn_open.setText("CL&OSE")
             except Exception as ex:
                 self.comm = None
-                QMessageBox.warning(self, self.windowTitle(), str(ex))
+                QMessageBox.warning(self, "OPEN", str(ex))
 
     def run_comm_thread(self):
         print("run_ser_thread: start")
