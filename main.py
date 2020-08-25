@@ -182,5 +182,6 @@ class SerialTest(QMainWindow):
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     window = SerialTest()
+    window.setWindowTitle(os.path.splitext(os.path.basename(sys.argv[0]))[0])
     window.show()
     sys.exit(app.exec())
