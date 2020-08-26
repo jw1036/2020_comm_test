@@ -4,9 +4,9 @@
 # $ ./venv/bin/python -m pip install pyinstaller
 # how to make exe
 # $ ./venv/bin/pyuic5 gui/window.ui -o gui/window.py
-# $ ./venv/bin/python -m PyInstaller -F -w -n SerialTest main.py gui/window.py
-# $ cp main.csv ./dis/SerialTest.csv
-# $ ./dist/SerialTest
+# $ ./venv/bin/python -m PyInstaller -F -w -n CommTest main.py gui/window.py comm.py packet.py hexdump.py
+# $ cp main.csv ./dis/CommTest.csv
+# $ ./dist/CommTest
 
 import binascii
 import csv
@@ -25,7 +25,7 @@ import hexdump
 _ENCODING = "euc-kr"
 
 
-class SerialTest(QMainWindow):
+class App(QMainWindow):
     def __init__(self):
         super().__init__()
         if os.path.exists("gui/window.ui"):
@@ -162,7 +162,7 @@ class SerialTest(QMainWindow):
                 QMessageBox.warning(self, "OPEN", str(ex))
 
     def run_comm_thread(self):
-        print("run_ser_thread: start")
+        print("run_comm_thread: start")
 
         while self.comm_thread_running:
             try:
@@ -173,15 +173,16 @@ class SerialTest(QMainWindow):
             except CommError as ex:
                 self.append_log(ex.raw, "<" + str(ex)[0])
             except Exception as ex:
-                print(f"run_ser_thread: {ex}")
+                print(f"run_comm_thread: {ex}")
                 break
 
-        print("run_ser_thread: stop")
+        print("run_comm_thread: stop")
 
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    window = SerialTest()
+    window = App()
     window.setWindowTitle(os.path.splitext(os.path.basename(sys.argv[0]))[0])
     window.show()
     sys.exit(app.exec())
+t
