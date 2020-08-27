@@ -1,10 +1,9 @@
 # how to make env (tested in python 3.6.9)
 # $ sudo apt-get install python-tk
 # $ python -m venv venv
-# $ ./venv/bin/python -m pip install -r requirements.txt
+# $ ./venv/bin/python -m pip install pyserial
 # $ ./venv/bin/python -m pip install pyinstaller
 # how to make exe
-# $ ./venv/bin/pyuic5 gui/window.ui -o gui/window.py
 # $ ./venv/bin/python -m PyInstaller -F -w -n CommTest main_tk.py comm.py packet.py hexdump.py
 # $ cp main_tk.csv ./dis/CommTest.csv
 # $ ./dist/CommTest
@@ -92,25 +91,34 @@ class App(tk.Frame):
         frame_2 = tk.Frame(frame)
         frame_2.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
 
-        frame_1_1 = tk.Frame(frame_2)
-        frame_1_1.pack(side=tk.TOP, fill=tk.X)
+        frame_2_1 = tk.Frame(frame_2)
+        frame_2_1.pack(side=tk.TOP, fill=tk.X)
 
-        self.caption_ed = tk.Entry(frame_1_1)
+        self.caption_ed = tk.Entry(frame_2_1)
         self.caption_ed.pack(side=tk.LEFT, fill=tk.X, expand=True)
 
-        self.send_btn = tk.Button(frame_1_1, text="SEND", underline=0, command=self.on_send_btn_clicked)
+        self.send_btn = tk.Button(frame_2_1, text="SEND", underline=0, command=self.on_send_btn_clicked)
         self.master.bind('<Alt-s>', self.on_send_btn_clicked)
         self.send_btn.pack(side=tk.RIGHT)
 
-        self.data_txt = tk.Text(frame_2, height=6)
-        self.data_txt.pack(side=tk.BOTTOM, fill=tk.BOTH, expand=True)
+        frame_2_2 = tk.Frame(frame_2)
+        frame_2_2.pack(side=tk.BOTTOM, fill=tk.BOTH, expand=True)
+
+        self.data_txt = tk.Text(frame_2_2, height=6)
+        self.data_txt.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+
+        self.data_txt_scroll = tk.Scrollbar(frame_2_2)
+        self.data_txt_scroll.pack(side=tk.RIGHT, fill=tk.Y)
+
+        self.data_txt.config(yscrollcommand=self.data_txt_scroll.set)
+        self.data_txt_scroll.config(command=self.data_txt.yview)
 
     def create_widgets_3rd(self):
         frame = tk.Frame(self)
         frame.pack(fill=tk.BOTH, expand=True)
 
         frame_1 = tk.Frame(frame)
-        frame_1.pack(fill=tk.BOTH)
+        frame_1.pack(fill=tk.BOTH, expand=True)
 
         self.log_lb = tk.Listbox(frame_1, height=6)
         self.log_lb.bind("<<ListboxSelect>>", self.on_log_lb_selected)
@@ -122,8 +130,17 @@ class App(tk.Frame):
         self.log_lb.config(yscrollcommand=self.log_lb_scroll.set)
         self.log_lb_scroll.config(command=self.log_lb.yview)
 
-        self.log_txt = tk.Text(frame, height=6)
-        self.log_txt.pack(fill=tk.BOTH, expand=True)
+        frame_2 = tk.Frame(frame)
+        frame_2.pack(fill=tk.BOTH, expand=True)
+
+        self.log_txt = tk.Text(frame_2, height=6)
+        self.log_txt.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+
+        self.log_txt_scroll = tk.Scrollbar(frame_2)
+        self.log_txt_scroll.pack(side=tk.RIGHT, fill=tk.Y)
+
+        self.log_txt.config(yscrollcommand=self.log_txt_scroll.set)
+        self.log_txt_scroll.config(command=self.log_txt.yview)
 
         self.log_ed = tk.Entry(frame)
         self.log_ed.pack(fill=tk.X)
