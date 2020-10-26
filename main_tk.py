@@ -1,11 +1,11 @@
 # how to make env (tested in python 3.6.9)
+# $ sudo apt-get install qttools5-dev-tools
 # $ sudo apt-get install python-tk
 # $ python -m venv venv
 # $ ./venv/bin/python -m pip install pyserial
 # $ ./venv/bin/python -m pip install pyinstaller
 # how to make exe
-# $ ./venv/bin/python -m PyInstaller -F -w -n CommTest main_tk.py comm.py packet.py hexdump.py
-# $ cp main_tk.csv ./dis/CommTest.csv
+# $ ./make_exe.sh
 # $ ./dist/CommTest
 
 import csv

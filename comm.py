@@ -5,7 +5,7 @@ import binascii
 _STX = 0x02
 _ETX = 0x03
 
-_TIMEOUT = 3
+_TIMEOUT = 1
 
 
 class CommError(Exception):
@@ -30,7 +30,7 @@ class CommDataError(CommError):
     pass
 
 
-class Comm:
+class Comm(object):
     @staticmethod
     def calc_lrc(dat, lrc=0):
         for c in dat:
@@ -42,7 +42,7 @@ class Comm:
         dat_len = len(dat) + 1
         raw = b''
         raw += bytes([_STX])
-        raw += bytes([dat_len >> 8, dat_len])
+        raw += bytes([dat_len >> 8, dat_len & 0xff])
         raw += dat
         raw += bytes([_ETX])
         raw += bytes([Comm.calc_lrc(raw, _STX)])

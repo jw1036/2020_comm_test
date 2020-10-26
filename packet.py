@@ -1,7 +1,7 @@
 import binascii
 
 
-class PacketBuilder:
+class PacketBuilder(object):
     def __init__(self, dat=b''):
         self.dat = dat
 
@@ -40,7 +40,7 @@ class PacketBuilder:
         return self
 
 
-class PacketParser:
+class PacketParser(object):
     def __init__(self, dat, fs=[]):
         self.dat = dat
         self.pos = 0
@@ -52,14 +52,15 @@ class PacketParser:
     def __repr__(self):
         return binascii.hexlify(self.dat).decode()
 
-    def parse(self, width, key=None):
+    def parse(self, width, key=None, fs=True):
         if width > len(self.dat) - self.pos:
             width = len(self.dat) - self.pos
 
         pos = self.pos
         for i in range(width):
-            if self.dat[self.pos] in self.fs:
-                break
+            if fs:
+                if self.dat[self.pos] in self.fs:
+                    break
             self.pos += 1
 
         return self.dat[pos: self.pos]
@@ -92,6 +93,5 @@ if __name__ == '__main__':
     parser = PacketParser(b'12345678\x1c\x1dABCDEFGH\x1cabcdefgh', [0x1d, 0x1c])
     print(parser.parse(5, "ITEM1") == b'12345')
     parser.next(0x1d)
-    print(parser.parse(10, "ITEM2") == b'ABCDEFGH')
-    parser.next(0x1c)
+    print(parser.parse(9, "ITEM2", False) == b'ABCDEFGH\x1c')
     print(parser.parse(10, "ITEM3") == b'abcdefgh')

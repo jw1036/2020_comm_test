@@ -1,11 +1,10 @@
 # how to make env (tested in python 3.6.9)
+# $ sudo apt-get install qttools5-dev-tools
 # $ python -m venv venv
 # $ ./venv/bin/python -m pip install -r requirements.txt
-# $ ./venv/bin/python -m pip install pyinstaller
 # how to make exe
-# $ ./venv/bin/pyuic5 gui/window.ui -o gui/window.py
-# $ ./venv/bin/python -m PyInstaller -F -w -n CommTest main.py gui/window.py comm.py packet.py hexdump.py
-# $ cp main.csv ./dis/CommTest.csv
+# $ ./make_ui.sh
+# $ ./make_exe.sh
 # $ ./dist/CommTest
 
 import binascii
@@ -185,4 +184,3 @@ if __name__ == '__main__':
     window.setWindowTitle(os.path.splitext(os.path.basename(sys.argv[0]))[0])
     window.show()
     sys.exit(app.exec())
-t
